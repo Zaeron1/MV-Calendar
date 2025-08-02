@@ -8,7 +8,7 @@ import pytz
 # ————— CONFIGURATION —————
 
 # Chemin vers votre dépôt Git local (doit déjà exister et avoir un remote "origin" configuré)
-REPO_DIR = '/chemin/vers/votre/depot'
+REPO_DIR = '/Users/alex/Documents/UCA/Documents perso/MV-Calendar'
 
 # Nom du fichier ICS dans le dépôt
 FILE_NAME = 'uca_mv_filtered.ics'
