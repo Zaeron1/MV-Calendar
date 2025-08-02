@@ -36,41 +36,33 @@ new_cal.add('version', '2.0')
 for comp in cal.walk():
     if comp.name == "VEVENT":
         desc = comp.get('description', '')
-        if "MV" in desc and "M2" not in desc:
+        # Ancienne condition : "MV" and not "M2"
+        # Nouvelle condition : on garde si MV existe et (pas de M2, ou bien M1 est présent)
+        if "MV" in desc and ("M2" not in desc or "M1" in desc):
             new_cal.add_component(comp)
 
 # ————— SAUVEGARDE DANS LE DÉPÔT —————
 
-# Chemin absolu du fichier ICS dans votre dépôt
 file_path = os.path.join(REPO_DIR, FILE_NAME)
-
-# Écriture du fichier
 with open(file_path, "wb") as f:
     f.write(new_cal.to_ical())
-
 print(f"✅ '{FILE_NAME}' mis à jour dans le dépôt.")
 
 # ————— COMMIT & PUSH —————
 
-# On se place dans le dépôt
 os.chdir(REPO_DIR)
-
-# 1) git add
 subprocess.run(["git", "add", FILE_NAME], check=True)
 
-# 2) git commit
 now = datetime.now(pytz.timezone(TZ))
 commit_msg = f"Update ICS le {now.strftime('%Y-%m-%d %H:%M:%S')}"
-# Si aucun changement à committer, on ignore
-res = subprocess.run(
-    ["git", "diff", "--cached", "--quiet"]
-)
+
+# Si des changements sont staged, on commit
+res = subprocess.run(["git", "diff", "--cached", "--quiet"])
 if res.returncode != 0:
     subprocess.run(["git", "commit", "-m", commit_msg], check=True)
     print(f"📝 Commit: {commit_msg}")
 else:
     print("ℹ️  Pas de changements à committer.")
 
-# 3) git push
 subprocess.run(["git", "push"], check=True)
 print("🚀 Push vers GitHub effectué.")
