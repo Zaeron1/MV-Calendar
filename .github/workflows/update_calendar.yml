@@ -1,0 +1,37 @@
+name: Update MV-Calendar
+
+on:
+  schedule:
+    - cron: "0 * * * *"  # Toutes les heures à pile
+  workflow_dispatch:      # Permet de le lancer manuellement depuis GitHub
+
+jobs:
+  update-calendar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout du dépôt
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Installer Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Installer les dépendances
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests icalendar pytz
+
+    - name: Lancer le script
+      run: python update_calendar.py
+
+    - name: Commit et Push
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add uca_mv_filtered.ics
+        git commit -m "Mise à jour automatique du calendrier" || echo "Pas de changement"
+        git push
