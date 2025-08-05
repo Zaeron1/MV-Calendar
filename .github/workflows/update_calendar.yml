@@ -2,7 +2,7 @@ name: Update MV-Calendar
 
 on:
   schedule:
-    - cron: "0 * * * *"  # Toutes les heures à pile
+    - cron: "*/5 * * * *"  # Toutes les heures à pile
   workflow_dispatch:      # Permet de le lancer manuellement depuis GitHub
 
 jobs:
