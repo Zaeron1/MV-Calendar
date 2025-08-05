@@ -1,33 +1,38 @@
-name: Update MV-Calendar
+name: Update UCA MV Calendar
 
 on:
   schedule:
-    - cron: "*/5 * * * *"  # Toutes les heures à pile
-  workflow_dispatch:      # Permet de le lancer manuellement depuis GitHub
+    - cron: "0 * * * *"   # Toutes les heures pile (UTC)
+  workflow_dispatch:        # Bouton "Run workflow"
 
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
 
     steps:
+    # 1️⃣ Récupération du dépôt
     - name: Checkout du dépôt
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
+    # 2️⃣ Installation de Python
     - name: Installer Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
+    # 3️⃣ Installation des dépendances
     - name: Installer les dépendances
       run: |
-        python -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install requests icalendar pytz
 
+    # 4️⃣ Lancer le script Python
     - name: Lancer le script
       run: python update_calendar.py
 
+    # 5️⃣ Commit & Push
     - name: Commit et Push
       run: |
         git config --global user.name "github-actions[bot]"
