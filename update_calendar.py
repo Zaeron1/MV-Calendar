@@ -26,7 +26,9 @@ new_cal.add('version', '2.0')
 for comp in cal.walk():
     if comp.name == "VEVENT":
         desc = comp.get('description', '')
-        if "MV" in desc and ("M2" not in desc or "M1" in desc):
+        if "MV" in desc and ("M2" not in desc or "M1" in desc)
+        or ("STPE" in desc and "STPE ScAC" not in desc)
+        ):
             new_cal.add_component(comp)
 
 # ————— SAUVEGARDE —————
