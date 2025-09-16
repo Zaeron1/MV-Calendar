@@ -1,8 +1,6 @@
 import os
 import requests
 from icalendar import Calendar, Event
-from datetime import datetime, timedelta
-import pytz
 
 # ————— CONFIGURATION —————
 REPO_DIR = '.'
@@ -12,9 +10,8 @@ URL_ICS = (
     "anonymous_cal.jsp?resources=17227,17226,15732,15724,"
     "10397,10385,10384,7652&projectId=3&calType=ical&nbWeeks=20&displayConfigId=128"
 )
-TZ = 'Europe/Brussels'
 
-# ————— TÉLÉCHARGEMENT ET FILTRAGE —————
+# ————— TÉLÉCHARGEMENT ET PARSING —————
 response = requests.get(URL_ICS)
 response.raise_for_status()
 
@@ -23,11 +20,14 @@ new_cal = Calendar()
 new_cal.add('prodid', '-//UCA Filtered MV Calendar//mxm.dk//')
 new_cal.add('version', '2.0')
 
+# ————— FILTRAGE DES ÉVÉNEMENTS —————
 for comp in cal.walk():
     if comp.name == "VEVENT":
         desc = comp.get('description', '')
-        if "MV" in desc and ("M2" not in desc or "M1" in desc)
-        or ("STPE" in desc and "STPE ScAC" not in desc)
+
+        if (
+            ("MV" in desc and ("M2" not in desc or "M1" in desc))
+            or ("STPE" in desc and "STPE ScAC" not in desc)
         ):
             new_cal.add_component(comp)
 
