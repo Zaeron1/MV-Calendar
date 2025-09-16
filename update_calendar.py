@@ -26,7 +26,7 @@ for comp in cal.walk():
         desc = comp.get('description', '')
 
         if (
-            ("MV" in desc and "M2" not in desc)
+            ("MV" in desc and "M1" in desc and "M2" not in desc)
             or ("STPE" in desc and "STPE ScAC" not in desc)
         ):
             new_cal.add_component(comp)
