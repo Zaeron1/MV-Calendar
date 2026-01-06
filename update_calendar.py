@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 from icalendar import Calendar
 
@@ -14,7 +15,6 @@ URL_ICS = (
 # ————— TÉLÉCHARGEMENT —————
 response = requests.get(URL_ICS)
 response.raise_for_status()
-
 cal = Calendar.from_ical(response.text)
 
 # ————— NOUVEAU CALENDRIER —————
@@ -22,41 +22,36 @@ new_cal = Calendar()
 new_cal.add('prodid', '-//UCA Filtered STPE MV M1 Calendar//')
 new_cal.add('version', '2.0')
 
-# ————— FONCTION DE FILTRAGE —————
-def accepte_evenement(desc: str) -> bool:
-    desc = str(desc)
+def has_token(text: str, token: str) -> bool:
+    # match "token" comme mot entier (ex: M1, M2, MV, STPE, ScAC)
+    return re.search(rf"\b{re.escape(token)}\b", text) is not None
 
-    has_stpe = "STPE" in desc
-    has_mv   = "MV" in desc
-    has_m1   = "M1" in desc
-    has_m2   = "M2" in desc
-    has_scac = "ScAC" in desc
+def accepte(desc) -> bool:
+    s = re.sub(r"\s+", " ", str(desc)).upper()
 
-    # 1) Doit concerner STPE ou MV
-    if not (has_stpe or has_mv):
-        return False
+    has_m1   = has_token(s, "M1")
+    has_m2   = has_token(s, "M2")
+    has_mv   = has_token(s, "MV")
+    has_stpe = has_token(s, "STPE")
+    has_scac = has_token(s, "SCAC")  # on met tout en upper
 
-    # 2) ScAC bloque seulement si MV n’est PAS présent
-    if has_scac and not has_mv:
-        return False
+    level_ok = has_m1 or (not has_m2)
 
-    # 3) Si M1 est présent → OK
-    if has_m1:
+    # 1) MV : on accepte (M1) ou (pas M2) — ScAC n'empêche pas si MV est là
+    if has_mv and level_ok:
         return True
 
-    # 4) Sinon, M2-only → rejet
-    if has_m2:
-        return False
+    # 2) Sinon, STPE seul : on rejette ScAC, et on rejette M2-only
+    if (not has_mv) and has_stpe and (not has_scac) and level_ok:
+        return True
 
-    # 5) Cas STPE/MV sans mention de niveau → OK
-    return True
+    return False
 
-# ————— FILTRAGE DES ÉVÉNEMENTS —————
+# ————— FILTRAGE —————
 for comp in cal.walk():
     if comp.name == "VEVENT":
         desc = comp.get('description', '')
-
-        if accepte_evenement(desc):
+        if accepte(desc):
             new_cal.add_component(comp)
 
 # ————— SAUVEGARDE —————
@@ -64,4 +59,5 @@ file_path = os.path.join(REPO_DIR, FILE_NAME)
 with open(file_path, "wb") as f:
     f.write(new_cal.to_ical())
 
-print(f"✅ '{FILE_NAME}' mis à jour avec le filtre STPE / MV / M1.")
+print(f"✅ '{FILE_NAME}' mis à jour.")
+
