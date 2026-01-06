@@ -26,25 +26,30 @@ new_cal.add('version', '2.0')
 def accepte_evenement(desc: str) -> bool:
     desc = str(desc)
 
-  # 1) Doit concerner STPE ou MV
-    if not ("STPE" in desc or "MV" in desc):
+    has_stpe = "STPE" in desc
+    has_mv   = "MV" in desc
+    has_m1   = "M1" in desc
+    has_m2   = "M2" in desc
+    has_scac = "ScAC" in desc
+
+    # 1) Doit concerner STPE ou MV
+    if not (has_stpe or has_mv):
         return False
 
-    # 2) ScAC exclu quoi qu’il arrive
-    if "ScAC" in desc:
+    # 2) ScAC bloque seulement si MV n’est PAS présent
+    if has_scac and not has_mv:
         return False
 
-    # 3) Si M1 présent → OK
-    if "M1" in desc:
+    # 3) Si M1 est présent → OK
+    if has_m1:
         return True
 
-    # 4) Sinon, on refuse les M2-only
-    if "M2" in desc:
+    # 4) Sinon, M2-only → rejet
+    if has_m2:
         return False
 
-    # 5) Cas STPE ou MV sans mention M1/M2 → OK
+    # 5) Cas STPE/MV sans mention de niveau → OK
     return True
-
 
 # ————— FILTRAGE DES ÉVÉNEMENTS —————
 for comp in cal.walk():
