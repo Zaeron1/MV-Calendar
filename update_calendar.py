@@ -26,23 +26,25 @@ new_cal.add('version', '2.0')
 def accepte_evenement(desc: str) -> bool:
     desc = str(desc)
 
-    # PRIORITÉ ABSOLUE : M1
+  # 1) Doit concerner STPE ou MV
+    if not ("STPE" in desc or "MV" in desc):
+        return False
+
+    # 2) ScAC exclu quoi qu’il arrive
+    if "ScAC" in desc:
+        return False
+
+    # 3) Si M1 présent → OK
     if "M1" in desc:
         return True
 
-    # CAS MV (hors M2)
-    if "MV" in desc and "M2" not in desc:
-        return True
+    # 4) Sinon, on refuse les M2-only
+    if "M2" in desc:
+        return False
 
-    # CAS STPE uniquement (hors M2 et ScAC)
-    if (
-        "STPE" in desc
-        and "M2" not in desc
-        and "ScAC" not in desc
-    ):
-        return True
+    # 5) Cas STPE ou MV sans mention M1/M2 → OK
+    return True
 
-    return False
 
 # ————— FILTRAGE DES ÉVÉNEMENTS —————
 for comp in cal.walk():
