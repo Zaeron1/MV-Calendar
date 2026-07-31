@@ -8,12 +8,8 @@ REPO_DIR = '.'
 FILE_NAME = 'uca_mv_filtered.ics'
 URL_ICS = (
     "https://edt.uca.fr/jsp/custom/modules/plannings/"
-    "anonymous_cal.jsp?resources=49414,49413,12012,"
-    "27239,27238,26821&projectId=4&calType=ical&nbWeeks=8&displayConfigId=128"
+    "anonymous_cal.jsp?resources=49414,49413,12012,27239,27238,26821&projectId=4&calType=ical&nbWeeks=8&displayConfigId=128"
 )
-
-
-
 
 # ————— TÉLÉCHARGEMENT —————
 response = requests.get(URL_ICS)
@@ -26,7 +22,6 @@ new_cal.add('prodid', '-//UCA Filtered STPE MV M2 Calendar//')
 new_cal.add('version', '2.0')
 
 def has_token(text: str, token: str) -> bool:
-    # match "token" comme mot entier (ex: M1, M2, MV, STPE, ScAC)
     return re.search(rf"\b{re.escape(token)}\b", text) is not None
 
 def accepte(desc) -> bool:
@@ -36,6 +31,11 @@ def accepte(desc) -> bool:
     has_mv   = has_token(s, "MV")
     has_stpe = has_token(s, "STPE")
     has_scac = has_token(s, "SCAC")
+    has_geo_volcan = has_token(s, "SPE GÉOPHY VOLCAN")
+    
+    # Cas spécial : si Spe Géophy Volcan est là, on affiche toujours
+    if has_geo_volcan:
+        return True
     
     level_ok = has_m2 or (not has_m1)  # Accepte si M2 OU pas M1
     
