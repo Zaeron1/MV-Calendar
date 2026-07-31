@@ -11,6 +11,8 @@ URL_ICS = (
     "anonymous_cal.jsp?resources=49414,49413,12012,27239,27238,26821&projectId=4&calType=ical&nbWeeks=8&displayConfigId=128"
 )
 
+
+
 # ————— TÉLÉCHARGEMENT —————
 response = requests.get(URL_ICS)
 response.raise_for_status()
