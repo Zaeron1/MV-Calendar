@@ -8,9 +8,12 @@ REPO_DIR = '.'
 FILE_NAME = 'uca_mv_filtered.ics'
 URL_ICS = (
     "https://edt.uca.fr/jsp/custom/modules/plannings/"
-    "anonymous_cal.jsp?resources=17227,17226,15732,15724,"
-    "10397,10385,10384,7652&projectId=3&calType=ical&nbWeeks=20&displayConfigId=128"
+    "anonymous_cal.jsp?resources=49414,49413,12012,"
+    "27239,27238,26821&projectId=4&calType=ical&nbWeeks=8&displayConfigId=128"
 )
+
+
+
 
 # ————— TÉLÉCHARGEMENT —————
 response = requests.get(URL_ICS)
