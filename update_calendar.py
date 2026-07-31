@@ -26,18 +26,18 @@ def has_token(text: str, token: str) -> bool:
 
 def accepte(desc) -> bool:
     s = re.sub(r"\s+", " ", str(desc)).upper()
+    
+    # Cas spécial : si "GÉOPHY" ET "VOLCAN" sont là, on affiche toujours
+    if "GÉOPHY" in s and "VOLCAN" in s:
+        return True
+    
     has_m1   = has_token(s, "M1")
     has_m2   = has_token(s, "M2")
     has_mv   = has_token(s, "MV")
     has_stpe = has_token(s, "STPE")
     has_scac = has_token(s, "SCAC")
-    has_geo_volcan = has_token(s, "SPE GÉOPHY VOLCAN")
     
-    # Cas spécial : si Spe Géophy Volcan est là, on affiche toujours
-    if has_geo_volcan:
-        return True
-    
-    level_ok = has_m2 or (not has_m1)  # Accepte si M2 OU pas M1
+    level_ok = has_m2 or (not has_m1)
     
     # 1) MV : on accepte (M2) ou (pas M1)
     if has_mv and level_ok:
