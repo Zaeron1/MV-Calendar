@@ -38,11 +38,12 @@ def accepte(desc) -> bool:
     has_mv   = has_token(s, "MV")
     has_stpe = has_token(s, "STPE")
     has_scac = has_token(s, "SCAC")
+    has_terre_primitive = has_token(s, "Primitive")
     
     level_ok = has_m2 or (not has_m1)
     
-    # 1) MV : on accepte (M2) ou (pas M1)
-    if has_mv and level_ok:
+    # 1) MV : on accepte (M2) ou (pas M1) et on rejette le cours de Terre Primitive
+    if has_mv and level_ok and (not has_terre_primitive):
         return True
     # 2) Sinon, STPE seul : on rejette ScAC, et on rejette M1-only
     if (not has_mv) and has_stpe and (not has_scac) and level_ok:
