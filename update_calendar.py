@@ -28,9 +28,10 @@ def has_token(text: str, token: str) -> bool:
 
 def accepte(desc) -> bool:
     s = re.sub(r"\s+", " ", str(desc)).upper()
+    title = re.sub(r"\s+", " ", str(summary)).upper()
     
-    # Cas spécial : si "GÉOPHY" ET "VOLCAN" sont là, on affiche toujours
-    if "GÉOPHY" in s and "VOLCAN" in s:
+    # Cas spécial : "VOLCAN" est là, on affiche toujours
+    if "VOLCAN" in s or title:
         return True
     
     has_m1   = has_token(s, "M1")
@@ -38,7 +39,7 @@ def accepte(desc) -> bool:
     has_mv   = has_token(s, "MV")
     has_stpe = has_token(s, "STPE")
     has_scac = has_token(s, "SCAC")
-    has_terre_primitive = has_token(s, "Primitive")
+    has_terre_primitive = has_token(title, "Primitive") # Ici pas dans la description mais dans le titre
     
     level_ok = has_m2 or (not has_m1)
     
@@ -46,7 +47,7 @@ def accepte(desc) -> bool:
     if has_mv and level_ok and (not has_terre_primitive):
         return True
     # 2) Sinon, STPE seul : on rejette ScAC, et on rejette M1-only
-    if (not has_mv) and has_stpe and (not has_scac) and level_ok:
+    if (not has_mv) and has_stpe and (not has_scac) and level_ok and (not has_terre_primitive):
         return True
     return False
 
