@@ -11,8 +11,6 @@ URL_ICS = (
     "anonymous_cal.jsp?resources=49414,49413,12012,27239,27238,26821&projectId=4&calType=ical&nbWeeks=8&displayConfigId=128"
 )
 
-
-
 # ————— TÉLÉCHARGEMENT —————
 response = requests.get(URL_ICS)
 response.raise_for_status()
@@ -26,41 +24,17 @@ new_cal.add('version', '2.0')
 def has_token(text: str, token: str) -> bool:
     return re.search(rf"\b{re.escape(token)}\b", text) is not None
 
-def accepte(desc) -> bool:
+def accepte(desc, summary) -> bool:
     s = re.sub(r"\s+", " ", str(desc)).upper()
     title = re.sub(r"\s+", " ", str(summary)).upper()
-    
-    # Cas spécial : "VOLCAN" est là, on affiche toujours
-    if "VOLCAN" in s or title:
+
+    # Cas spécial : "VOLCAN" dans la description ou le titre → on affiche toujours
+    if "VOLCAN" in s or "VOLCAN" in title:
         return True
-    
+
     has_m1   = has_token(s, "M1")
     has_m2   = has_token(s, "M2")
     has_mv   = has_token(s, "MV")
     has_stpe = has_token(s, "STPE")
     has_scac = has_token(s, "SCAC")
-    has_terre_primitive = has_token(title, "Primitive") # Ici pas dans la description mais dans le titre
-    
-    level_ok = has_m2 or (not has_m1)
-    
-    # 1) MV : on accepte (M2) ou (pas M1) et on rejette le cours de Terre Primitive
-    if has_mv and level_ok and (not has_terre_primitive):
-        return True
-    # 2) Sinon, STPE seul : on rejette ScAC, et on rejette M1-only
-    if (not has_mv) and has_stpe and (not has_scac) and level_ok and (not has_terre_primitive):
-        return True
-    return False
-
-# ————— FILTRAGE —————
-for comp in cal.walk():
-    if comp.name == "VEVENT":
-        desc = comp.get('description', '')
-        summary = comp.get('summary', '')
-        if accepte(desc, summary):
-            new_cal.add_component(comp)
-
-# ————— SAUVEGARDE —————
-file_path = os.path.join(REPO_DIR, FILE_NAME)
-with open(file_path, "wb") as f:
-    f.write(new_cal.to_ical())
-print(f"✅ '{FILE_NAME}' mis à jour.")
+    has_terre_primitive =
