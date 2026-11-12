@@ -37,4 +37,28 @@ def accepte(desc, summary) -> bool:
     has_mv   = has_token(s, "MV")
     has_stpe = has_token(s, "STPE")
     has_scac = has_token(s, "SCAC")
-    has_terre_primitive =
+    has_terre_primitive = has_token(title, "PRIMITIVE")  # dans le titre, pas la description
+
+    level_ok = has_m2 or (not has_m1)
+
+    # 1) MV : on accepte (M2) ou (pas M1), sauf Terre Primitive
+    if has_mv and level_ok and (not has_terre_primitive):
+        return True
+    # 2) Sinon, STPE seul : on rejette ScAC, M1-only et Terre Primitive
+    if (not has_mv) and has_stpe and (not has_scac) and level_ok and (not has_terre_primitive):
+        return True
+    return False
+
+# ————— FILTRAGE —————
+for comp in cal.walk():
+    if comp.name == "VEVENT":
+        desc = comp.get('description', '')
+        summary = comp.get('summary', '')
+        if accepte(desc, summary):
+            new_cal.add_component(comp)
+
+# ————— SAUVEGARDE —————
+file_path = os.path.join(REPO_DIR, FILE_NAME)
+with open(file_path, "wb") as f:
+    f.write(new_cal.to_ical())
+print(f"✅ '{FILE_NAME}' mis à jour.")
