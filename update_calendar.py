@@ -55,7 +55,8 @@ def accepte(desc) -> bool:
 for comp in cal.walk():
     if comp.name == "VEVENT":
         desc = comp.get('description', '')
-        if accepte(desc):
+        summary = comp.get('summary', '')
+        if accepte(desc, summary):
             new_cal.add_component(comp)
 
 # ————— SAUVEGARDE —————
